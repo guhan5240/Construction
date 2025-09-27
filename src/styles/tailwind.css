@@ -1,0 +1,70 @@
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
+
+@layer base {
+  :root {
+    --global-bg-1: #000000;
+    --global-bg-2: #0000007f;
+    --global-bg-3: #ffffff;
+    --global-bg-4: #ffffff7f;
+    --global-text-1: #000000;
+    --global-text-2: #ffffff;
+    --button-bg-1: #646464;
+    --button-text-1: #111111;
+    --footer-text-1: #a0a0a0;
+  }
+}
+
+@layer utilities {
+  .bg-global-1 { background-color: var(--global-bg-1); }
+  .bg-global-2 { background-color: var(--global-bg-2); }
+  .bg-global-3 { background-color: var(--global-bg-3); }
+  .bg-global-4 { background-color: var(--global-bg-4); }
+  .text-global-1 { color: var(--global-text-1); }
+  .text-global-2 { color: var(--global-text-2); }
+  .bg-button-1 { background-color: var(--button-bg-1); }
+  .text-button-1 { color: var(--button-text-1); }
+  .text-footer-1 { color: var(--footer-text-1); }
+}
+
+body {
+  font-family: 'Manrope', 'Inter', sans-serif;
+  margin: 0px;
+  padding: 0px;
+  box-sizing: border-box;
+}
+
+*, *::before, *::after {
+  box-sizing: inherit;
+}
+
+.categories-container {
+  text-align: center;
+  margin: 20px;
+}
+
+.categories-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+}
+
+.category-item {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 10px;
+}
+
+.category-item img {
+  width: 100%;
+  border-radius: 8px;
+}
+
+.category-item h3 {
+  margin-top: 10px;
+  font-size: 20px;
+}
+
+
+

@@ -1,0 +1,75 @@
+{
+  "name": "chatgpt_s_application",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "rocketCritical": {
+    "dependencies": [
+      "react",
+      "react-dom",
+      "prop-types",
+      "react-router-dom",
+      "@dhiwise/component-tagger",
+      "@tailwindcss/typography",
+      "recharts"
+    ],
+    "devDependencies": [
+      "@vitejs/plugin-react",
+      "vite",
+      "tailwindcss",
+      "autoprefixer",
+      "postcss",
+      "eslint",
+      "prettier"
+    ],
+    "scripts": [
+      "start",
+      "build",
+      "preview",
+      "serve",
+      "lint",
+      "lint:fix",
+      "format"
+    ],
+    "warning": "🚨 CRITICAL: DO NOT REMOVE OR MODIFY ABOVE DEPENDENCIES - Required for app functionality"
+  },
+  "scripts": {
+    "start": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "serve": "vite preview",
+    "format": "prettier --write \"src/**/*.{js,jsx,css,md,json}\""
+  },
+  "dependencies": {
+    "@dhiwise/component-tagger": "^1.0.10",
+    "@flaticon/flaticon-uicons": "^3.3.1",
+    "@fontsource/azeret-mono": "^5.2.9",
+    "@fontsource/barlow-condensed": "^5.2.6",
+    "@fontsource/manrope": "^5.2.6",
+    "@tailwindcss/typography": "^0.5.16",
+    "axios": "^1.11.0",
+    "bootstrap": "^5.3.3",
+    "framer-motion": "^12.23.12",
+    "lucide-react": "^0.540.0",
+    "prop-types": "^15.8.1",
+    "razorpay": "^2.9.6",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-helmet": "^6.1.0",
+    "react-icons": "^5.5.0",
+    "react-router-dom": "^6.30.1",
+    "recharts": "^2.15.2",
+    "universal-cookie": "^8.0.1"
+  },
+  "devDependencies": {
+    "@types/react": "^18.2.45",
+    "@types/react-dom": "^18.2.18",
+    "@vitejs/plugin-react": "^5.0.2",
+    "autoprefixer": "^10.4.20",
+    "globals": "^15.15.0",
+    "postcss": "^8.5.0",
+    "prettier": "^3.5.3",
+    "tailwindcss": "^3.4.14",
+    "vite": "^7.1.3"
+  }
+}

@@ -1,0 +1,238 @@
+import React, { useState, useEffect, useRef } from 'react';
+import Button from '../ui/Button';
+import { products, popularProducts } from '../../products/data';
+import WishlistHeart from '../CommonPage/WishlistHeart';
+import { Link } from 'react-router-dom';
+
+const Home = () => {
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const totalSlides = 5;
+  const slideInterval = 5000;
+  const slides = [
+    '/images/slide1.png',
+    '/images/slide2.png',
+    '/images/slide3.png',
+    '/images/slide4.png',
+    '/images/slide5.png',
+  ];
+
+  const [selectedCategory, setSelectedCategory] = useState('Tracks');
+  const categories = ['Tracks', 'Shorts', 'T-Shirts'];
+
+  const [hoveredProduct, setHoveredProduct] = useState(null);
+  const [productImageIndex, setProductImageIndex] = useState({});
+
+  // 🔥 use filtered products
+  const filteredProducts = products.filter(
+    (p) => p.category === selectedCategory
+  );
+
+  // Scroll effect states
+  const [hhProgress, setHhProgress] = useState(0);
+  const [hhTranslateY, setHhTranslateY] = useState(0);
+  const handRef = useRef(null);
+
+  useEffect(() => {
+    const onScroll = () => {
+      if (!handRef.current) return;
+      const el = handRef.current;
+      const sectionTop = el.offsetTop;
+      const sectionHeight = el.offsetHeight;
+      const scrollY = window.scrollY;
+      const vh = window.innerHeight;
+      const denom = Math.max(1, sectionHeight - vh);
+      const p = Math.min(1, Math.max(0, (scrollY - sectionTop) / denom));
+      setHhProgress(p);
+      setHhTranslateY((0.3 - 0.4 * p) * vh);
+    };
+
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll);
+    return () => {
+      window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('resize', onScroll);
+    };
+  }, []);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % totalSlides);
+    }, slideInterval);
+    return () => clearInterval(interval);
+  }, [totalSlides]);
+
+  const goToNext = () => setCurrentSlide((prev) => (prev + 1) % totalSlides);
+  const goToPrev = () => setCurrentSlide((prev) => (prev - 1 + totalSlides) % totalSlides);
+  const goToSlide = (index) => setCurrentSlide(index);
+
+  const handleMouseEnter = (productId) => setHoveredProduct(productId);
+  const handleMouseLeave = () => setHoveredProduct(null);
+
+  const changeImage = (productId, direction) => {
+    setProductImageIndex((prev) => {
+      const currentImages = [...products, ...popularProducts].find(
+        (p) => p.id === productId
+      )?.images;
+      if (!currentImages) return prev;
+      const currentIndex = prev[productId] !== undefined ? prev[productId] : 0;
+      let newIndex = currentIndex + direction;
+      if (newIndex >= currentImages.length) newIndex = 0;
+      else if (newIndex < 0) newIndex = currentImages.length - 1;
+      return { ...prev, [productId]: newIndex };
+    });
+  };
+
+  return (
+    <>
+      {/* Hero Slider */}
+      <section className="w-full relative">
+        <div className="w-full h-[400px] sm:h-[600px] lg:h-[958px] overflow-hidden">
+          {slides.map((slide, index) => (
+            <div
+              key={index}
+              className={`absolute top-0 left-0 w-full h-full transition-opacity duration-500 ${
+                index === currentSlide ? 'opacity-100' : 'opacity-0'
+              }`}
+              style={{
+                backgroundImage: `url(${slide})`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+              }}
+            >
+              <div className="w-full py-[26px] sm:py-[40px] lg:py-[52px]">
+                <div className="w-full max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-[160px] flex flex-col items-start justify-end min-h-full">
+                  <Button
+                    variant="primary"
+                    className="absolute bottom-[80px] sm:bottom-[100px] lg:bottom-[320px] left-4 sm:left-6 lg:left-[160px] bg-gray-800 text-black font-['Azeret_Mono'] text-[10px] sm:text-[12px] font-normal px-[6px] sm:px-[8px] py-[6px] sm:py-[8px] rounded-[5px]"
+                  >
+                    SHOP NOW
+                  </Button>
+                  <div className="absolute bottom-[80px] sm:bottom-[100px] lg:bottom-[120px] right-4 sm:right-6 lg:right-[160px] flex items-center gap-[12px] sm:gap-[18px]">
+                    <button
+                      onClick={goToPrev}
+                      className="bg-global-3 px-4 py-2 sm:px-6 sm:py-3 rounded-md hover:bg-gray-100"
+                    >
+                      <svg width="16" height="16" fill="black" viewBox="0 0 24 24">
+                        <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12l4.58-4.59z" />
+                      </svg>
+                    </button>
+                    <button
+                      onClick={goToNext}
+                      className="bg-global-3 px-4 py-2 sm:px-6 sm:py-3 rounded-md hover:bg-gray-100"
+                    >
+                      <svg width="16" height="16" fill="black" viewBox="0 0 24 24">
+                        <path d="M8.59 16.59L10 18l6-6-6-6-1.41 1.41L13.17 12l-4.58 4.59z" />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))}
+          <div className="absolute bottom-[10px] sm:bottom-[20px] left-0 right-0 flex justify-center gap-[8px]">
+            {slides.map((_, index) => (
+              <button
+                key={index}
+                onClick={() => goToSlide(index)}
+                className={`w-[30px] h-[4px] sm:w-[40px] sm:h-[5px] rounded-full ${
+                  index === currentSlide ? 'bg-white scale-x-125' : 'bg-gray-400'
+                }`}
+              ></button>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Categories */}
+      <section className="w-full bg-global-3 py-[21px] sm:py-[32px] lg:py-[42px]">
+        {/* ... your categories code unchanged ... */}
+      </section>
+
+      {/* Products with filter */}
+      <section className="w-full bg-global-3 py-[20px] sm:py-[30px] lg:py-[40px]">
+        <div className="w-full max-w-[1800px] mx-auto px-4 sm:px-6 lg:px-8 flex flex-col gap-[12px]">
+          <div className="flex flex-wrap gap-[8px]">
+            {categories.map((category) => (
+              <button
+                key={category}
+                onClick={() => setSelectedCategory(category)}
+                className={`font-['Azeret_Mono'] text-[12px] sm:text-[14px] px-[8px] py-[10px] ${
+                  selectedCategory === category
+                    ? 'bg-global-1 text-global-2'
+                    : 'bg-global-3 text-global-1 hover:bg-gray-100'
+                }`}
+              >
+                {category}
+              </button>
+            ))}
+          </div>
+
+          {/* ✅ fixed here - now using filteredProducts */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-[16px]">
+            {filteredProducts.map((product) => (
+              <div
+                key={product.id}
+                className="flex flex-col gap-[10px]"
+                onMouseEnter={() => handleMouseEnter(product.id)}
+                onMouseLeave={handleMouseLeave}
+              >
+                <div className="relative w-full">
+                  <Link to={`/product/${product.id}`}>
+                    <img
+                      src={product.images[productImageIndex[product.id] || 0]}
+                      alt={product.title}
+                      className="w-full h-[300px] sm:h-[350px] lg:h-[470px] object-cover"
+                    />
+                  </Link>
+                  {hoveredProduct === product.id && (
+                    <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-6">
+                      <button
+                        onClick={(e) => {
+                          e.preventDefault();
+                          changeImage(product.id, -1);
+                        }}
+                        className="p-2 w-[130px] h-[35px] bg-white text-black hover:bg-black hover:text-white"
+                      >
+                        ‹
+                      </button>
+                      <button
+                        onClick={(e) => {
+                          e.preventDefault();
+                          changeImage(product.id, 1);
+                        }}
+                        className="p-2 w-[130px] h-[35px] bg-white text-black hover:bg-black hover:text-white"
+                      >
+                        ›
+                      </button>
+                    </div>
+                  )}
+                  <div className="absolute top-[10px] left-0 right-0 flex justify-between px-[10px]">
+                    <span className="bg-global-4 text-global-1 text-[10px] px-2 py-1">
+                      {product.badge}
+                    </span>
+                    <WishlistHeart product={product} />
+                  </div>
+                </div>
+                <div className="flex flex-col gap-[4px] px-[10px] pb-[10px]">
+                  <h3 className="text-global-1 text-[12px] sm:text-[14px]">{product.title}</h3>
+                  <span className="text-global-1 text-[10px] sm:text-[12px] font-semibold">
+                    {product.price}
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Hand to Hand Section */}
+      {/* ... unchanged ... */}
+
+      {/* Popular Products Section */}
+      {/* ... unchanged ... */}
+    </>
+  );
+};
+
+export default Home;
