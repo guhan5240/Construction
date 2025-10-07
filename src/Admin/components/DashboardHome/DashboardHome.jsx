@@ -16,24 +16,86 @@
 
 import React from 'react';
 import { ShoppingCart, Users, Package, DollarSign } from 'lucide-react';
-
+import Cookies from 'universal-cookie';
+import { useState } from 'react';
+import { useEffect } from 'react';
+import axios from 'axios';
 const DashboardHome = () => {
+
+  useEffect(() => {
+getTotal();
+console.log("called");
+  });
+
+  const [totalProducts,setTotalProducts]=useState(0);
+  const [totalCustomers,setTotalCustomers]=useState(0);
+  const[totalOrders,setTotalOrders]=useState(0);
+  const token=new Cookies().get("adminToken");
+
+  const getTotal=async()=>{
+
+    // get total products
+    await axios.get("http://localhost:8080/api/v1/admin/products/product-count",{
+  headers: {
+      Authorization: `Bearer   ${token}`, // MUST start with Bearer
+      "Content-Type": "application/json", // or multipart/form-data if file
+    },
+}).then((res)=>{
+setTotalProducts(res.data);
+console.log(token);
+
+}).catch((err)=>{
+  console.log("error");
+});
+
+// get total customers
+ await axios.get("http://localhost:8080/api/v1/admin/products/customer-count",{
+  headers: {
+      Authorization: `Bearer   ${token}`, // MUST start with Bearer
+      "Content-Type": "application/json", // or multipart/form-data if file
+    },
+}).then((res)=>{
+setTotalCustomers(res.data);
+
+console.log("totalcustomers");
+
+}).catch((err)=>{
+  console.log("error");
+});
+
+// get total orders
+ await axios.get("http://localhost:8080/api/v1/admin/products/order-count",{
+  headers: {
+      Authorization: `Bearer   ${token}`, // MUST start with Bearer
+      "Content-Type": "application/json", // or multipart/form-data if file
+    },
+}).then((res)=>{
+setTotalOrders(res.data);
+console.log("totalorders");
+
+}).catch((err)=>{
+  console.log("error");
+});
+  }
+useEffect(async()=>{
+getProductTotal(); 
+},[])
   const stats = [
     {
       title: 'Total Orders',
-      value: '0',
+      value: totalOrders,
       icon: <ShoppingCart size={24} />,
       color: 'bg-blue-500'
     },
     {
       title: 'Total Customers',
-      value: '0',
+      value: totalCustomers,
       icon: <Users size={24} />,
       color: 'bg-green-500'
     },
     {
       title: 'Total Products',
-      value: '0',
+      value: totalProducts,
       icon: <Package size={24} />,
       color: 'bg-purple-500'
     },

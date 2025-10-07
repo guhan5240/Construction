@@ -33,7 +33,7 @@ const AdminLogin= () => {
              token=res.data.token;
              cookies.set("adminToken",token);
              console.log("token",token);
-                navigate("/")
+                navigate("/Admin")
             }).catch((err)=>{
                 alert("Please enter your details");
         ; });

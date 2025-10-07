@@ -7,9 +7,30 @@ import Button from '../ui/Button';
 import { products, popularProducts } from '../../products/data';
 import WishlistHeart from '../CommonPage/WishlistHeart';
 import { Link } from 'react-router-dom';
+import axios from 'axios';
 
 const Home = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
+
+  const [products1, setProducts1] = useState([]);
+  
+  const getAllProducts = async () => {
+  try {
+    const res = await axios.get("http://localhost:8080/api/v1/admin/products/getall");
+    const items = res.data; 
+    setProducts1(items);
+  } catch (err) {
+    console.error("products not found", err);
+  }
+}
+ const categoryMap = {
+    1: 'New Arrival',
+    2: 'Trending',
+    3: 'Shorts',
+    4: 'Shorts',
+    
+  };
+
   const totalSlides = 5;
   const slideInterval = 5000;
   const slides = [
@@ -19,16 +40,18 @@ const Home = () => {
     '/images/slide4.png',
     '/images/slide5.png',
   ];
-  const [selectedCategory, setSelectedCategory] = useState('Tracks');
-  const categories = ['Tracks', 'Shorts', 'T-Shirts'];
+  const [selectedCategory, setSelectedCategory] = useState('TRACKS');
+  const categories = ['TRACKS', 'SHORTS', 'T_SHIRT'];
   const [hoveredProduct, setHoveredProduct] = useState(null);
   const [productImageIndex, setProductImageIndex] = useState({});
 
-  const filteredProducts = products.filter(
-  (p) => p.category === selectedCategory
+  const filteredProducts = products1.filter(
+   
+  (p) => p.productType === selectedCategory
+
 );
 
-
+                          //http://localhost:8080/api/v1/admin/products/getall
   // Scroll effect states - replacing the hook
   const [hhProgress, setHhProgress] = useState(0);
   const [hhTranslateY, setHhTranslateY] = useState(0);
@@ -36,6 +59,7 @@ const Home = () => {
 
   // Scroll effect implementation - replacing useScrollEffect hook
   useEffect(() => {
+     getAllProducts();
     const onScroll = () => {
       if (!handRef.current) return;
       const el = handRef.current;
@@ -58,6 +82,7 @@ const Home = () => {
     };
   }, []);
 
+  
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % totalSlides);
@@ -232,6 +257,7 @@ const Home = () => {
             ))}
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-[16px] sm:gap-[20px] lg:gap-[24px]">
+            {   console.log("products1:", filteredProducts) }
             {filteredProducts.map((product) => (
               // Inside your map loop:
               <div
@@ -244,7 +270,7 @@ const Home = () => {
                   {/* Make image clickable to detail */}
                   <Link to={`/product/${product.id}`}>
                     <img
-                      src={product.images[productImageIndex[product.id] || 0]}
+                      src={product.images}//[productImageIndex[product.id] || 0]}
                       alt={product.title}
                       className="w-full h-[300px] sm:h-[350px] lg:h-[470px] object-cover"
                     />
@@ -288,7 +314,9 @@ const Home = () => {
 
                   <div className="absolute top-[10px] left-0 right-0 flex justify-between px-[10px]">
                     <span className="bg-global-4 text-global-1 text-[10px] sm:text-[12px] font-semibold px-2 py-1">
-                      {product.badge}
+                      {
+                      
+                      categoryMap[product.categoryId]}
                     </span>
                     <WishlistHeart product={product} />
                   </div>

@@ -101,26 +101,7 @@ const Products = () => {
 
   let token=cookie.get("adminToken");
 
-  const formdata222={
-  name: "Red T-Shirt",
-  description: "Cotton t-shirt",
-  images: ["https://via.placeholder.com/150"],
-  gender: "MALE",
-  materialCare: "Machine wash cold, tumble dry low",
-  productType: "T_SHIRT",
-  status: "ACTIVE",
-  stockStatus: "IN_STOCK",
-  categoryId: 3,
-  salePrice: 0.0,
-  cost: 200.0,
-  sizeSpecificPricing: true,
-  availableSizes: ["S", "M", "L"],
-  variants: [
-    {size: "S", price: 449.0, stock: 100, variantName: "Red T-Shirt - Small"},
-    {size: "M", price: 499.0, stock: 150, variantName: "Red T-Shirt - Medium"},
-    {size: "L", price: 529.0, stock: 120, variantName: "Red T-Shirt - Large"}
-  ]
-}
+
     
   
    // or wherever you store JWT
@@ -347,9 +328,8 @@ const response = await axios.post(
 )
     .then((res)=>{
     setMessage({ type: 'success', text: 'Product saved successfully!' });
-      {/**  setFormData({
-        name: '',
-    categoryId:'',
+       setFormData({ name: '',
+    categoryId: 0,
      description: '',
     materialCare: '',
    gender: '',
@@ -357,14 +337,14 @@ const response = await axios.post(
      availableSizes: [],
    sizeSpecificPricing: false,
     
-    price: '',
-    salePrice: '',
-    cost: '',
+    price: 0,
+    salePrice: 0,
+    cost: 0,
     status: 'Active',
    stockStatus: '',
     images: [],
     variants: []
-  });*/}
+  });
     })
     .catch((err)=>{
      // console.log(formData222)
@@ -760,7 +740,7 @@ const response = await axios.post(
                   type="file"
                   name="images"
                   onChange={handleChangeimg}
-
+                  
                   accept="image/*"
                   multiple
                   className="hidden"
@@ -771,6 +751,23 @@ const response = await axios.post(
                   <p className="text-gray-600">Choose Files</p>
                   <p className="text-xs text-gray-500 mt-1">No file chosen</p>
                 </label>
+                  {/* Image Previews */}
+                 <div className="flex flex-wrap justify-center mt-4 gap-2">
+             {formData.images && formData.images.length > 0 &&
+  formData.images.map((file, idx) => {
+    // Only create object URL if file is a File object
+    const src = file instanceof File ? URL.createObjectURL(file) : file;
+    return (
+      <img
+        key={idx}
+        src={src}
+        alt={`preview-${idx}`}
+        className="w-20 h-20 object-cover rounded border"
+      />
+    );
+  })
+}
+    </div>
               </div>
             </div>
 

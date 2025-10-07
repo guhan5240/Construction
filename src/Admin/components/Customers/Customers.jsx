@@ -31,32 +31,55 @@
 
 import React, { useEffect, useState } from 'react';
 import { Users, Mail, Phone, MapPin, Package, Eye } from 'lucide-react';
+import axios from 'axios';
+import Cookies from 'universal-cookie';
 
 const Customers = () => {
   const [customers, setCustomers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedCustomer, setSelectedCustomer] = useState(null);
+   const token=new Cookies().get("adminToken");
 
   useEffect(() => {
-    const fetchCustomers = async () => {
-      try {
-        setLoading(true);
-        // Replace with your API endpoint
-        // const response = await axios.get('http://localhost:8080/api/customers');
-        // setCustomers(response.data);
+    // const fetchCustomers = async () => {
+    //   try {
+    //     setLoading(true);
+    //     // Replace with your API endpoint
+    //     // const response = await axios.get('http://localhost:8080/api/customers');
+    //     // setCustomers(response.data);
         
-        // Simulate API call
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        setCustomers([]); // Empty array for now
-      } catch (error) {
-        console.error('Error fetching customers:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
+    //     // Simulate API call
+    //     await new Promise(resolve => setTimeout(resolve, 1000));
+    //     setCustomers([]); // Empty array for now
+    //   } catch (error) {
+    //     console.error('Error fetching customers:', error);
+    //   } finally {
+    //     setLoading(false);
+    //   }
+    // };
 
-    fetchCustomers();
+    // fetchCustomers();
+getCutomers();
+
   }, []);
+
+  const getCutomers = async () => {
+
+await axios.get("http://localhost:8080/api/v1/admin/customers",{
+  headers: {
+      Authorization: `Bearer   ${token}`, // MUST start with Bearer
+      "Content-Type": "application/json", // or multipart/form-data if file
+    },
+}).then((res)=>{
+setCustomers(res.data);
+console.log(token);
+setLoading(false);
+
+}).catch((err)=>{
+  console.log("error");
+});
+
+  }
 
   return (
     <div className="p-6 bg-gray-100 min-h-screen">
@@ -133,7 +156,7 @@ const Customers = () => {
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm text-gray-900 flex items-center gap-1">
                         <Mail size={14} />
-                        {customer.email}
+                        {customer.identifier}
                       </div>
                       <div className="text-sm text-gray-500 flex items-center gap-1">
                         <Phone size={14} />
@@ -152,6 +175,7 @@ const Customers = () => {
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                       <button
                         onClick={() => setSelectedCustomer(customer)}
+
                         className="text-blue-600 hover:text-blue-900 flex items-center gap-1"
                       >
                         <Eye size={14} />
@@ -191,7 +215,7 @@ const Customers = () => {
                   <label className="text-sm font-medium text-gray-700">Email:</label>
                   <p className="text-gray-900 flex items-center gap-1">
                     <Mail size={14} />
-                    {selectedCustomer.email}
+                    {selectedCustomer.identifier}
                   </p>
                 </div>
                 
@@ -203,13 +227,7 @@ const Customers = () => {
                   </p>
                 </div>
                 
-                <div>
-                  <label className="text-sm font-medium text-gray-700">Address:</label>
-                  <p className="text-gray-900 flex items-start gap-1">
-                    <MapPin size={14} className="mt-0.5" />
-                    {selectedCustomer.address}
-                  </p>
-                </div>
+               
                 
                 <div>
                   <label className="text-sm font-medium text-gray-700">Total Orders:</label>

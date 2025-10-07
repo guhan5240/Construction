@@ -1,20 +1,41 @@
 // src/components/LoginPage/LoginPage.jsx
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-
+import axios from "axios";
+import Cookies from "universal-cookie";
 const LoginPage = () => {
-  const [activeTab, setActiveTab] = useState("email");
+  const [activeTab, setActiveTab] = useState("email")
   const [inputValue, setInputValue] = useState("");
-  const navigate = useNavigate();
+  const[checked,setChecked]=useState(false);
 
-  const handleContinue = () => {
+   const userCookies=new Cookies();
+ const userdata = {
+  "identifier": inputValue,
+  "agreedToTerms":checked
+};
+   
+        userCookies.set("inputValue",inputValue);
+  const navigate = useNavigate();
+  
+  
+  const handleContinue = async() => {
+      
+console.log(userdata)
     if (!inputValue) {
       alert("Please enter your details");
       return;
-    }
-    navigate("/otp"); // go to OTP page
-  };
+    }else{
+      console.log("enter");
+      console.log(userdata);
+      await axios.post("http://localhost:8080/api/v1/auth/register",userdata).then((res)=>{
 
+       userCookies.set("userToken",res.data.token);
+     navigate("/otp"); // go to OTP page
+    }).catch(()=>{
+     alert("try again");
+      return;
+  });
+    }}
   return (
     <div className="min-h-screen bg-white flex items-center justify-center px-4 py-8">
       <div className="w-full max-w-md mx-auto">
@@ -29,6 +50,7 @@ const LoginPage = () => {
         <div className="flex justify-center mb-4">
           <button
             onClick={() => setActiveTab("email")}
+           
             className={`px-4 py-2 text-sm font-medium ${
               activeTab === "email"
                 ? "bg-black text-white"
@@ -38,7 +60,7 @@ const LoginPage = () => {
             E-mail
           </button>
           <button
-            onClick={() => setActiveTab("phone")}
+          onClick={() => setActiveTab("phone")}
             className={`px-4 py-2 text-sm font-medium ${
               activeTab === "phone"
                 ? "bg-black text-white"
@@ -57,7 +79,8 @@ const LoginPage = () => {
               activeTab === "email" ? "Enter your E-mail" : "Enter your Phone no"
             }
             value={inputValue}
-            onChange={(e) => setInputValue(e.target.value)}
+            
+           onChange={(e) => setInputValue(e.target.value)}
             className="w-full px-4 py-3 bg-gray-200 text-gray-700 placeholder-gray-500 border-none rounded-md focus:outline-none focus:ring-2 focus:ring-black"
           />
         </div>
@@ -65,6 +88,7 @@ const LoginPage = () => {
         {/* Continue Button */}
         <button
           onClick={handleContinue}
+
           className="w-full px-4 py-3 bg-black text-white font-medium rounded-md hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-black mb-4"
         >
           Continue
@@ -72,7 +96,7 @@ const LoginPage = () => {
 
         {/* Terms */}
         <div className="flex items-center justify-center">
-          <input type="checkbox" id="terms" className="mr-2" />
+          <input type="checkbox" id="terms" className="mr-2" onClick={()=>setChecked(true)}/>
           <label htmlFor="terms" className="text-sm text-gray-800">
             Agree to Terms & Condition and Privacy Policy
           </label>

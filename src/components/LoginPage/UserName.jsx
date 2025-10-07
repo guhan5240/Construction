@@ -1,25 +1,38 @@
 // src/components/LoginPage/UserDetails.jsx
+import axios from "axios";
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import Cookies from "universal-cookie";
 
 const UserName = () => {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const inputValue=new Cookies().get("inputValue");
+  const user={
+    firstName:firstName,
+    lastName:lastName
+  }
+  const handleSubmit = async(e) => {
   e.preventDefault();
 
   if (!firstName.trim()) {
     alert("First Name is required");
     return;
   }
+  await axios.post(`http://localhost:8080/api/v1/auth/update-profile?identifier=${inputValue}`,user).then((res)=>{
+     navigate("/");
+  }).catch((err)=>{
+      alert("Error updating profile, please try again.");
+    console.log("User Data:", { firstName, lastName });
+  });
 
   // 👉 Here you can send data to backend later
-  console.log("User Data:", { firstName, lastName });
+  
 
   // Go to Home Page
-  navigate("/");
+ 
 };
 
   return (

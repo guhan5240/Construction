@@ -1,11 +1,20 @@
 // src/components/LoginPage/OtpPage.jsx
+import axios from "axios";
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
+import Cookies from "universal-cookie";
 
 const Verification = () => {
+
+    const userCookie=new Cookies();
+    const userToken=userCookie.get("userToken");
   const [otp, setOtp] = useState(Array(6).fill(""));
   const [timer, setTimer] = useState(240); // 4 mins countdown
   const inputRefs = useRef([]);
+const otpValue = otp.join("");
+    const optdata={otp:otpValue}
+
+
   const navigate = useNavigate();
 
   // Countdown timer
@@ -29,19 +38,26 @@ const Verification = () => {
   };
 
   // Handle Submit
-  const handleSubmit = () => {
-    const otpValue = otp.join("");
+  const  handleSubmit =async () => {
+   
+    
+     console.log("otp",optdata);
     if (otpValue.length < 6) {
       alert("⚠️ Please enter full 6-digit OTP");
       return;
     }
 
-    // ✅ Example check - you can replace with API validation
-    if (otpValue === "123456") {
-      navigate("/user-details"); // move to your next page
-    } else {
-      alert("❌ Invalid OTP, try again!");
-    }
+    await axios.post("http://localhost:8080/api/v1/auth/verify-otp",optdata).then((res)=>{
+       navigate("/user-details");
+    }).catch(()=>{
+         alert("❌ Invalid OTP, try again!");
+    });
+    // ✅ Example check - you can replace with API validation 
+    // if (otpValue === "123456") {//http://localhost:8080/api/v1/auth/verify-otp
+    //   navigate("/user-details"); // move to your next page
+    // } else {
+    //  
+    // }
   };
 
   const minutes = String(Math.floor(timer / 60)).padStart(2, "0");
@@ -59,12 +75,13 @@ const Verification = () => {
         <div className="flex justify-center gap-2 mb-4">
           {otp.map((digit, i) => (
             <input
-              key={i}
-              ref={(el) => (inputRefs.current[i] = el)}
-              type="text"
-              maxLength="1"
-              value={digit}
-              onChange={(e) => handleChange(e.target.value, i)}
+                key={i}
+        ref={el => inputRefs.current[i] = el}
+        type="text"
+        inputMode="numeric"
+        maxLength={1}
+        value={digit}
+        onChange={e => handleChange(e.target.value.replace(/[^0-9]/g, ""), i)}
               className="w-12 h-12 text-center text-lg border border-gray-400 rounded-md focus:outline-none focus:ring-2 focus:ring-black"
             />
           ))}

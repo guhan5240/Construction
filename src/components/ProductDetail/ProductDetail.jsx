@@ -1,22 +1,40 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext ,useEffect} from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { CartContext } from "../../Context/CardContext"; 
 import { products } from "../../products/data";
+import axios from "axios";
 
 const ProductDetail = () => {
   const { id } = useParams();
+  
   const navigate = useNavigate();
   const { addToCart } = useContext(CartContext); // get addToCart function
 
   const product = products.find((p) => p.id === Number(id));
 
+  
+  const[product1,setProducts1]=useState([]);
+  
   const [mainImage, setMainImage] = useState(product?.images[0]);
   const [selectedSize, setSelectedSize] = useState(null);
   const [selectedColor, setSelectedColor] = useState(null);
 
+
+  const getProduct=async()=>{
+    await axios.get(`http://localhost:8080/api/v1/admin/products/10`).then((res)=>{
+     
+      setProducts1(res.data);}).catch((err)=>{});
+  }
   const availableColors = ["#C1442E", "#000000", "#1E90FF", "#228B22"];
 
-  if (!product) {
+  //
+  useEffect(()=>{
+console.log("enter")
+    getProduct();
+  },[])
+
+ 
+  if (!product1) {
     return <h2 className="text-center mt-10">Product not found</h2>;
   }
 
@@ -58,7 +76,7 @@ const ProductDetail = () => {
           <div className="flex-1">
             <img
               src={mainImage}
-              alt={product.title}
+              alt={product1.name}
               className="w-full h-[500px] object-cover rounded-xl shadow-md"
             />
           </div>
@@ -67,14 +85,14 @@ const ProductDetail = () => {
         {/* Right: Info */}
         <div className="flex flex-col gap-6">
           <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold">
-            {product.title}
+            {product1.name}
           </h1>
-          <p className="text-lg sm:text-xl font-semibold">{product.price}</p>
+          <p className="text-lg sm:text-xl font-semibold">{product1.price}</p>
           {/* Size Selector */}
           <div>
             <h3 className="mb-2 text-sm font-medium">Select Size</h3>
             <div className="flex items-center gap-3">
-              {["S", "M", "L", "XL", "XXL"].map((size) => (
+              {product1.availableSizes.map((size) => (
                 <button
                   key={size}
                   onClick={() => setSelectedSize(size)}
@@ -123,14 +141,14 @@ const ProductDetail = () => {
           <div className="border-t pt-4">
             <details className="py-2 border-b">
               <summary className="cursor-pointer font-medium">Purpose</summary>
-              <p className="mt-2 text-sm text-gray-600">{product.purpose}</p>
+              <p className="mt-2 text-sm text-gray-600">{product1.description}</p>
             </details>
             <details className="py-2 border-b">
               <summary className="cursor-pointer font-medium">
                 Material Care
               </summary>
               <p className="mt-2 text-sm text-gray-600">
-                {product.materialCare}
+                {product1.materialCare}
               </p>
             </details>
             <details className="py-2">
