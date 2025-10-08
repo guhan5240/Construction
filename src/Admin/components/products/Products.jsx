@@ -81,6 +81,7 @@ import React, { useState } from 'react';
 import { Upload, Package, AlertCircle } from 'lucide-react';
 import axios from 'axios';
 import Cookies from 'universal-cookie';
+import { v4 as uuidv4 } from 'uuid';
 
 
 // Define RichTextEditor outside the Products component
@@ -96,6 +97,15 @@ const RichTextEditor = ({ name, value, onChange, placeholder }) => (
 );
 
 const Products = () => {
+
+  const [sizespeprice,setsizespeprice]=useState([])
+
+  const setsizeprices=(e,size)=>{
+    console.log("enter");
+    setsizespeprice({...sizespeprice,[e.target.name]:e.target.value})
+   // setsizespeprice({...sizespeprice,size:size})
+  }
+  
 
   const cookie=new Cookies();
 
@@ -145,12 +155,17 @@ const Products = () => {
           setFormData(prev => ({
             ...prev,
             availableSizes: selectedSizes,
-            sizePrices: {
-              ...prev.sizePrices,
+            variants: {
+              ...prev.variants,
               [value]: { price: '', salePrice: '', cost: '' }
             }
           }));
-          return;
+          //  "variants": [
+  //   {"size": "S", "price": 449.0, "stock": 100, "variantName": "Red T-Shirt - Small"},
+  //   {"size": "M", "price": 499.0, "stock": 150, "variantName": "Red T-Shirt - Medium"},
+  //   {"size": "L", "price": 529.0, "stock": 120, "variantName": "Red T-Shirt - Large"}
+  // ]
+  //         return;
         }
       } else {
         const index = selectedSizes.indexOf(value);
@@ -556,14 +571,14 @@ const response = await axios.post(
                         <tr>
                           <th className="px-4 py-3 text-left text-sm font-medium text-gray-700 border-b">Size</th>
                           <th className="px-4 py-3 text-left text-sm font-medium text-gray-700 border-b">Price</th>
-                          <th className="px-4 py-3 text-left text-sm font-medium text-gray-700 border-b">Sale Price</th>
-                          <th className="px-4 py-3 text-left text-sm font-medium text-gray-700 border-b">Cost</th>
+                          <th className="px-4 py-3 text-left text-sm font-medium text-gray-700 border-b">stock</th>
+                          <th className="px-4 py-3 text-left text-sm font-medium text-gray-700 border-b">VariantName</th>
                         </tr>
                       </thead>
                       <tbody>
                         {formData.availableSizes.map((size, index) => (
                           <tr key={size} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-25'}>
-                            <td className="px-4 py-3 text-sm font-medium text-gray-900 border-b">{size}</td>
+                           {/*  <td className="px-4 py-3 text-sm font-medium text-gray-900 border-b">{size}</td>
                             <td className="px-4 py-3 border-b">
                               <input
                                 type="number"
@@ -594,6 +609,36 @@ const response = await axios.post(
                                 placeholder="0.00"
                                 min="0"
                                 step="0.01"
+                                className="w-full border border-gray-300 p-2 rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                              />
+                            </td>*/}
+                           <td className="px-4 py-3 text-sm font-medium text-gray-900 border-b">{size}</td>
+                            <td className="px-4 py-3 border-b">
+                              <input
+                                type="number"
+                                min="0"
+                                step="0.01"
+                                name="price"
+                                onChange={(e)=>setsizeprices(e,size)}
+                                className="w-full border border-gray-300 p-2 rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                              />
+                            </td>
+                            <td className="px-4 py-3 border-b">
+                              <input
+                                type="number"
+                                min="0"
+                                step="0.01"
+                                 name="stock"
+                                  
+                                onChange={(e)=>setsizeprices(e)}
+                                className="w-full border border-gray-300 p-2 rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                              />
+                            </td>
+                            <td className="px-4 py-3 border-b">
+                              <input
+                                type="text"
+                                name="variantName"
+                               onChange={(e)=>setsizeprices(e)}
                                 className="w-full border border-gray-300 p-2 rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                               />
                             </td>
