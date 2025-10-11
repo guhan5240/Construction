@@ -98,12 +98,40 @@ const RichTextEditor = ({ name, value, onChange, placeholder }) => (
 
 const Products = () => {
 
-  const [sizespeprice,setsizespeprice]=useState([])
+  const [sizenew,setSizeNew]=useState([])
+  const [sizespeprice,setsizespeprice]=useState()
 
-  const setsizeprices=(e,size)=>{
-    console.log("enter");
-    setsizespeprice({...sizespeprice,[e.target.name]:e.target.value})
-   // setsizespeprice({...sizespeprice,size:size})
+ const setsizeprices = (e) => {
+    // normalize numeric fields
+   // const parsed = (field === 'price' || field === 'stock') ? (value === '' ? '' : Number(value)) : value;
+        console.log("enter...........");
+        setSizeNew((prev) => [...prev, sizespeprice])
+        setsizespeprice({...sizespeprice,[e.target.name]:e.target.value})
+
+//after color change
+
+
+    // setsizespeprice(prev => {
+    //   const idx = prev.findIndex(item => item.size === size);
+    //   if (idx > -1) {
+    //     const next = [...prev];
+    //     next[idx] = { ...next[idx], [field]: parsed };
+    //     return next;
+    //   } else {
+    //     // create new record for this size
+    //     return [...prev, { size, price: '', stock: '', variantName: '', [field]: parsed }];
+    //   }
+    // });
+  //  setFormData(prev => {
+  //     const next = { ...prev };
+  //     next.sizePrices = { ...(next.sizePrices || {}) };
+  //     next.sizePrices[size] = {
+  //       ...(next.sizePrices[size] || { price: '', stock: '', variantName: '' }),
+  //       [field]: parsed
+  //     };
+  //     return next;
+  //   });
+  
   }
   
 
@@ -124,15 +152,40 @@ const Products = () => {
    productType: '',
      availableSizes: [],
    sizeSpecificPricing: false,
-    
+    weight:0,
+    quantity:0,
+    segment:"",
+    colors:[],
     price: 0,
     salePrice: 0,
     cost: 0,
     status: 'Active',
    stockStatus: '',
     images: [],
-    variants: []
+    variants: sizespeprice
   });
+
+    // new state for color input
+  const [colorInput, setColorInput] = useState('');
+  
+  // add a color to formData.colors
+  const handleAddColor = () => {
+    const color = (colorInput || '').trim();
+    if (!color) return;
+    setFormData(prev => ({
+            ...prev,
+      colors: [...(prev.colors || []), color]
+    }));
+    setColorInput('');
+  };
+
+  // remove a color by index
+  const handleRemoveColor = (index) => {
+    setFormData(prev => ({
+      ...prev,
+      colors: prev.colors.filter((_, i) => i !== index)
+    }));
+  };
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [message, setMessage] = useState({ type: '', text: '' });
@@ -152,14 +205,14 @@ const Products = () => {
       if (checked) {
         selectedSizes.push(value);
         if (formData.sizeSpecificPricing) {
-          setFormData(prev => ({
-            ...prev,
-            availableSizes: selectedSizes,
-            variants: {
-              ...prev.variants,
-              [value]: { price: '', salePrice: '', cost: '' }
-            }
-          }));
+          // setFormData(prev => ({
+          //   ...prev,
+          //   availableSizes: selectedSizes,
+          //   variants: {
+          //     ...prev.variants,
+          //     [value]: { price: '', salePrice: '', cost: '' }
+          //   }
+          // }));
           //  "variants": [
   //   {"size": "S", "price": 449.0, "stock": 100, "variantName": "Red T-Shirt - Small"},
   //   {"size": "M", "price": 499.0, "stock": 150, "variantName": "Red T-Shirt - Medium"},
@@ -174,11 +227,11 @@ const Products = () => {
         }
         const newSizePrices = { ...formData.sizePrices };
         delete newSizePrices[value];
-        setFormData(prev => ({
-          ...prev,
-          availableSizes: selectedSizes,
-          sizePrices: newSizePrices
-        }));
+        // setFormData(prev => ({
+        //   ...prev,
+        //   availableSizes: selectedSizes,
+        //   sizePrices: newSizePrices
+        // }));
         return;
       }
       setFormData(prev => ({
@@ -193,12 +246,12 @@ const Products = () => {
       
       if (checked) {
         const sizePrices = {};
-        formData.availableSizes.forEach(size => {
-          sizePrices[size] = { price: '', salePrice: '', cost: '' };
-        });
-        newState.sizePrices = sizePrices;
+        // formData.availableSizes.forEach(size => {
+        //   sizePrices[size] = { price: '', salePrice: '', cost: '' };
+        // });
+        // newState.sizePrices = sizePrices;
       } else {
-        newState.sizePrices = {};
+       // newState.sizePrices = {};
       }
       
       setFormData(newState);
@@ -351,7 +404,10 @@ const response = await axios.post(
    productType: '',
      availableSizes: [],
    sizeSpecificPricing: false,
-    
+    weight:0,
+    quantity:0,
+    segment:"",
+    colors:[],
     price: 0,
     salePrice: 0,
     cost: 0,
@@ -388,6 +444,10 @@ const response = await axios.post(
                     productType: '',
                     availableSizes: [],
                     sizeSpecificPricing: false,
+                    weight:0,
+    quantity:0,
+    segment:"",
+    colors:[],
                     sizePrices: {},
                     price: '',
                     salePrice: '',
@@ -563,6 +623,8 @@ const response = await axios.post(
               </div>
 
               {formData.sizeSpecificPricing && formData.availableSizes.length > 0 && (
+
+                formData.variants=sizespeprice,
                 <div className="mt-6">
                   <h3 className="text-md font-medium text-gray-700 mb-4">Size-wise Pricing</h3>
                   <div className="overflow-x-auto">
@@ -612,36 +674,43 @@ const response = await axios.post(
                                 className="w-full border border-gray-300 p-2 rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                               />
                             </td>*/}
-                           <td className="px-4 py-3 text-sm font-medium text-gray-900 border-b">{size}</td>
-                            <td className="px-4 py-3 border-b">
-                              <input
-                                type="number"
-                                min="0"
-                                step="0.01"
-                                name="price"
-                                onChange={(e)=>setsizeprices(e,size)}
-                                className="w-full border border-gray-300 p-2 rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                              />
+                          {/** <td className="px-4 py-3 text-sm font-medium text-gray-900 border-b">{size}</td>*/} 
+                           <td className="px-4 py-3 border-b">
+                             <input
+                                 type="text"
+                                   name="variantName"
+                                       onChange={(e) => setsizeprices(e)}
+                                        className="w-full border border-gray-300 p-2 rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                             />
                             </td>
-                            <td className="px-4 py-3 border-b">
-                              <input
-                                type="number"
-                                min="0"
-                                step="0.01"
-                                 name="stock"
-                                  
-                                onChange={(e)=>setsizeprices(e)}
-                                className="w-full border border-gray-300 p-2 rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                              />
-                            </td>
-                            <td className="px-4 py-3 border-b">
-                              <input
-                                type="text"
-                                name="variantName"
-                               onChange={(e)=>setsizeprices(e)}
-                                className="w-full border border-gray-300 p-2 rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                              />
-                            </td>
+                           <td className="px-4 py-3 border-b">
+  <input
+    type="number"
+    min="0"
+    step="1"
+    name="stock"
+    onChange={(e) => setsizeprices(e)}
+    className="w-full border border-gray-300 p-2 rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+  />
+</td>
+
+
+                       {formData.availableSizes.map((size,index)=>(
+                          <td key={index} className="px-4 py-3 border-b">
+                           <input
+                            type="number"
+                            min="0"
+                            value="0"
+                            step="0.01"
+                            name={size}
+                            onChange={(e) => setsizeprices(e)}
+                            //className="w-full border border-gray-300 p-2 rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                          />
+</td>
+                        
+                       ))}  
+ 
+
                           </tr>
                         ))}
                       </tbody>
@@ -650,6 +719,99 @@ const response = await axios.post(
                 </div>
               )}
             </div>
+
+            <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      weight
+                    </label>
+                    <input
+                      type="Number"
+                      name="weight"
+                     // value={formData.salePrice}
+                      onChange={handleChangeNumber}
+                      placeholder="0.00"
+                      min="0"
+                      step="0.01"
+                      className="w-full border border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    />
+                  </div>
+                   <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      quantity
+                    </label>
+                    <input
+                      type="Number"
+                      name="quantity"
+                     // value={formData.salePrice}
+                      onChange={handleChangeNumber}
+                      placeholder="0.00"
+                      min="0"
+                      step="0.01"
+                      className="w-full border border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    />
+                  </div>
+                  
+<div>
+  <label className="block text-sm font-medium text-gray-700 mb-2">
+    Color
+  </label>
+  {/* <input
+    type="text"
+   
+    className="w-full border border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+  /> */}
+  <div className="flex gap-2">
+    <input
+      type="text"
+      value={colorInput}
+      onChange={(e) => setColorInput(e.target.value)}
+      onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); handleAddColor(); } }}
+      placeholder="Enter a color (e.g. Red)"
+      className="flex-1 border border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+   />
+    <button
+      type="button"
+      onClick={handleAddColor}
+      className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+    >
+      Add
+   </button>
+  </div>
+
+  <div className="mt-2 flex flex-wrap gap-2">
+    {formData.colors && formData.colors.length > 0 ? (
+      formData.colors.map((c, i) => (
+        <span key={i} className="inline-flex items-center gap-2 px-3 py-1 bg-gray-100 rounded-full text-sm">
+          <span>{c}</span>
+          <button
+            type="button"
+            onClick={() => handleRemoveColor(i)}
+            className="text-red-600 hover:text-red-700"
+            aria-label={`Remove color ${c}`}
+          >
+            ✕
+          </button>
+        </span>
+      ))
+   ) : (
+     <p className="text-xs text-gray-500">No colors added</p>
+    )}
+  </div>
+</div>
+
+                   <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      segment
+                    </label>
+                    <input
+                      type="text"
+                      name="segment"
+                     // value={formData.salePrice}
+                      onChange={handleChange}
+                     
+                      className="w-full border border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    />
+                  </div>
 
             {formData.sizeSpecificPricing ? (
               <div className="bg-white rounded-lg border border-gray-200 p-6">
@@ -741,6 +903,10 @@ const response = await axios.post(
                   </div>
                 </div>
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+                  {//new changes
+                  }
+                   
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       Status *
@@ -816,7 +982,7 @@ const response = await axios.post(
               </div>
             </div>
 
-            <div className="bg-white rounded-lg border border-gray-200 p-6">
+            {/* <div className="bg-white rounded-lg border border-gray-200 p-6">
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-lg font-medium text-gray-900">Product Variants</h2>
                 <button
@@ -880,7 +1046,7 @@ const response = await axios.post(
                   </div>
                 </div>
               ))}
-            </div>
+            </div> */}
           </div>
         </div>
       </div>

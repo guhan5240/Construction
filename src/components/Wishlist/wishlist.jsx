@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 // import { useWishlist } from "../../Context/WishlistContext";
 import { useWishlist } from "../../Context/WishlistContext";
 
@@ -6,8 +6,8 @@ import { useWishlist } from "../../Context/WishlistContext";
 
 
 const Wishlist = () => {
-  const { wishlist, removeFromWishlist } = useWishlist();
-
+ // const { wishlist, removeFromWishlist } = useWishlist(1);
+ const [ wishlist, removeFromWishlist ] = useState([{name:"guhan"},{name:"guhan"}]);
   return (
     <div className="w-full max-w-[1650px] mx-auto px-4 sm:px-6 lg:px-12 py-8">
       <h1 className="font-barlow text-2xl sm:text-3xl md:text-5xl tracking-wide mb-6">
