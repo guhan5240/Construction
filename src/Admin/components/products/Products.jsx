@@ -77,7 +77,7 @@
 
 // export default Products;
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Upload, Package, AlertCircle } from 'lucide-react';
 import axios from 'axios';
 import Cookies from 'universal-cookie';
@@ -98,6 +98,13 @@ const RichTextEditor = ({ name, value, onChange, placeholder }) => (
 
 const Products = () => {
 
+
+  const[variant13,setVariant13]=useState();
+  const[size13,setSize13]=useState();
+
+  
+
+
   const [sizenew,setSizeNew]=useState([])
   const [sizespeprice,setsizespeprice]=useState()
 
@@ -105,8 +112,9 @@ const Products = () => {
     // normalize numeric fields
    // const parsed = (field === 'price' || field === 'stock') ? (value === '' ? '' : Number(value)) : value;
         console.log("enter...........");
-        setSizeNew((prev) => [...prev, sizespeprice])
+       
         setsizespeprice({...sizespeprice,[e.target.name]:e.target.value})
+         setSizeNew([...sizenew, sizespeprice])
 
 //after color change
 
@@ -134,13 +142,66 @@ const Products = () => {
   
   }
   
+  
 
   const cookie=new Cookies();
 
   let token=cookie.get("adminToken");
 
 
-    
+//     const addVariant13=(e)=>{
+//         setVariant13({...variant13,[e.target.name]:e.target.value})
+//   }
+//   const addVariantsize13=(e)=>{
+//         setSize13({...size13,[e.target.name]:e.target.value})
+//   }
+
+//   const[allVariant,setAllVariant]=useState([])
+
+//   const addConcat=()=>{
+// setAllVariant([...allVariant,{...variant13,sizeSpecificPrices:size13}]);
+
+//setAllVariant(...allVariant,{...variant13,sizeSpecificPrices:size13})
+// setFormData({...formData,aavariants:allVariant})
+//   }
+
+const addVariant13 = (e) => {
+  const { name, value } = e.target;
+  setVariant13(prev => ({ ...prev, [name]: value }));
+  if(name==="stock"){
+setVariant13(prev => ({ ...prev, [name]:Number(value) }));
+  console.log("enter")
+  }
+  
+};
+const addVariantsize13 = (e) => {
+  const { name, value } = e.target;
+  setSize13(prev => ({ ...prev, [name]:Number(value) }));
+};
+
+const [allVariant, setAllVariant] = useState([]);
+
+const addConcat = () => {
+  // basic validation
+  if (!variant13 || Object.keys(variant13).length === 0) return;
+
+  setAllVariant(prev => {
+    // deep clone size13 to avoid later mutation affecting stored entry
+    const clonedSize = JSON.parse(JSON.stringify(size13 || {}));
+    const newEntry = { ...variant13, sizeSpecificPrices: clonedSize };
+
+    const next = [...prev, newEntry];
+
+    // keep formData in sync with the new array immediately
+    setFormData(prevForm => ({ ...prevForm, variants: next }));
+
+    // reset current row inputs
+    setVariant13({});
+    setSize13({});
+
+    return next;
+  });
+};
   
    // or wherever you store JWT
   const [formData, setFormData] = useState({
@@ -162,8 +223,12 @@ const Products = () => {
     status: 'Active',
    stockStatus: '',
     images: [],
-    variants: sizespeprice
+   
+    
+   
   });
+
+  
 
     // new state for color input
   const [colorInput, setColorInput] = useState('');
@@ -280,49 +345,49 @@ setFormData({...formData,[e.target.name]:Number(e.target.value)});
     }));
   }
 
-  const handleSizePriceChange = (size, field, value) => {
-    setFormData(prev => ({
-      ...prev,
-      sizePrices: {
-        ...prev.sizePrices,
-        [size]: {
-          ...prev.sizePrices[size],
-          [field]: value
-        }
-      }
-    }));
-  };}
+  // const handleSizePriceChange = (size, field, value) => {
+  //   setFormData(prev => ({
+  //     ...prev,
+  //     sizePrices: {
+  //       ...prev.sizePrices,
+  //       [size]: {
+  //         ...prev.sizePrices[size],
+  //         [field]: value
+  //       }
+  //     }
+  //   }));
+  // };}
 
-  const handleVariantChange = (variantId, field, value) => {
-    setFormData(prev => ({
-      ...prev,
-      variants: prev.variants.map(variant => 
-        variant.id === variantId ? { ...variant, [field]: value } : variant
-      )
-    }));
-  };
+  // const handleVariantChange = (variantId, field, value) => {
+  //   setFormData(prev => ({
+  //     ...prev,
+  //     variants: prev.variants.map(variant => 
+  //       variant.id === variantId ? { ...variant, [field]: value } : variant
+  //     )
+  //   }));
+  // };
 
-  const addVariant = () => {
-    const newVariant = {
-      id: Date.now(),
-      name: '',
-      materialCare: '',
-      description: ''
-    };
-    setFormData(prev => ({
-      ...prev,
-      variants: [...prev.variants, newVariant]
-    }));
-  };
+  // const addVariant = () => {
+  //   const newVariant = {
+  //     id: Date.now(),
+  //     name: '',
+  //     materialCare: '',
+  //     description: ''
+  //   };
+  //   setFormData(prev => ({
+  //     ...prev,
+  //     variants: [...prev.variants, newVariant]
+  //   }));
+  // };
 
-  const removeVariant = (variantId) => {
-    if (formData.variants.length > 1) {
-      setFormData(prev => ({
-        ...prev,
-        variants: prev.variants.filter(variant => variant.id !== variantId)
-      }));
-    }
-  };
+  // const removeVariant = (variantId) => {
+  //   if (formData.variants.length > 1) {
+  //     setFormData(prev => ({
+  //       ...prev,
+  //       variants: prev.variants.filter(variant => variant.id !== variantId)
+  //     }));
+  //   }
+   };
 
   const handleSubmit = async (e) => {
     //e.preventDefault();
@@ -414,7 +479,7 @@ const response = await axios.post(
     status: 'Active',
    stockStatus: '',
     images: [],
-    variants: []
+   // variants: []
   });
     })
     .catch((err)=>{
@@ -455,12 +520,7 @@ const response = await axios.post(
                     status: 'Active',
                     stockStatus: '',
                     productImages: null,
-                    variants: [{
-                      id: 1,
-                      name: '',
-                      materialCare: '',
-                      description: ''
-                    }]
+                   
                   });
                   setMessage({ type: '', text: '' });
                 }}
@@ -624,21 +684,70 @@ const response = await axios.post(
 
               {formData.sizeSpecificPricing && formData.availableSizes.length > 0 && (
 
-                formData.variants=sizespeprice,
+               // formData.variants=sizespeprice,
                 <div className="mt-6">
                   <h3 className="text-md font-medium text-gray-700 mb-4">Size-wise Pricing</h3>
                   <div className="overflow-x-auto">
                     <table className="min-w-full border border-gray-200 rounded-lg">
                       <thead className="bg-gray-50">
                         <tr>
-                          <th className="px-4 py-3 text-left text-sm font-medium text-gray-700 border-b">Size</th>
-                          <th className="px-4 py-3 text-left text-sm font-medium text-gray-700 border-b">Price</th>
-                          <th className="px-4 py-3 text-left text-sm font-medium text-gray-700 border-b">stock</th>
                           <th className="px-4 py-3 text-left text-sm font-medium text-gray-700 border-b">VariantName</th>
+                          <th className="px-4 py-3 text-left text-sm font-medium text-gray-700 border-b">Stock</th>
+                        
+
+                          {formData.availableSizes.map((size)=>(
+                               <th className="px-4 py-3 text-left text-sm font-medium text-gray-700 border-b">{size}</th>
+                          ))}
+                         
                         </tr>
                       </thead>
                       <tbody>
-                        {formData.availableSizes.map((size, index) => (
+
+                        {formData.colors.map((color)=>(
+                          <tr>
+                            <td>
+                               <input
+                                 type="text"
+                                  name="variantName"
+                                  
+                                  onChange={(e)=>addVariant13(e)}
+                                 // onChange={(e) => setsizeprices(e)}
+                                  className="w-full border border-gray-300 p-2 rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                        />
+                            </td>
+                            <td>
+                               <input
+                                 type="number"
+                                 min="0"
+                                  step="1"
+                                  name="stock"
+                                  onChange={(e)=>addVariant13(e)}
+                                 // onChange={(e) => setsizeprices(e)}
+                                  className="w-full border border-gray-300 p-2 rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                        />
+                            </td>
+                                                        
+
+                            {formData.availableSizes.map((size)=>(
+                               <td>
+                               <input
+                                 type="number"
+                                 min="0"
+                                  step="1"
+                                  name={size}
+                                  onChange={(e)=>addVariantsize13(e)}
+                                 // onChange={(e) => setsizeprices(e)}
+                                  className="w-full border border-gray-300 p-2 rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                        />
+                            </td>                          ))}
+
+                            <td>
+                              <button onClick={()=>addConcat()}>Add</button>
+                            </td>
+
+                          </tr>
+                        ))}
+                      {/**  1st   {formData.availableSizes.map((size, index) => (
                           <tr key={size} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-25'}>
                            {/*  <td className="px-4 py-3 text-sm font-medium text-gray-900 border-b">{size}</td>
                             <td className="px-4 py-3 border-b">
@@ -675,7 +784,7 @@ const response = await axios.post(
                               />
                             </td>*/}
                           {/** <td className="px-4 py-3 text-sm font-medium text-gray-900 border-b">{size}</td>*/} 
-                           <td className="px-4 py-3 border-b">
+                          {/** 2nd <td className="px-4 py-3 border-b">
                              <input
                                  type="text"
                                    name="variantName"
@@ -712,7 +821,7 @@ const response = await axios.post(
  
 
                           </tr>
-                        ))}
+                        ))}   */}
                       </tbody>
                     </table>
                   </div>
